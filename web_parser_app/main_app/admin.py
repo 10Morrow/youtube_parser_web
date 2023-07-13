@@ -1,3 +1,12 @@
 from django.contrib import admin
+from .models import Video, VideoGroup
 
-# Register your models here.
+
+@admin.register(Video)
+class VideoAdmin(admin.ModelAdmin):
+    pass
+
+
+@admin.register(VideoGroup)
+class VideoGroupAdmin(admin.ModelAdmin):
+    pass

@@ -1,0 +1,24 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Список видео</title>
+</head>
+<body>
+    <a href="/start_parsing">START PARSING</a>
+    <h2>{{new_id}}</h2>
+    <form method="GET">
+    <select name="identifier">
+        {% for identifier in identifiers %}
+            <option value="{{ identifier }}">{{ identifier }}</option>
+        {% endfor %}
+    </select>
+    <input type="submit" value="Загрузить">
+    </form>
+    <h1>Список видео</h1>
+    <ul>
+        {% for video in videos %}
+        <li>{{ video.video_link }}</li>
+        {% endfor %}
+    </ul>
+</body>
+</html>

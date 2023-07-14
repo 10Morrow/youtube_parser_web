@@ -1,17 +1,24 @@
 from django.http import HttpResponse
-from django.shortcuts import render
+from django.shortcuts import render, get_object_or_404
 from .models import Video, VideoGroup
+import time
 
 
 def video_list_view(request):
-    video_group = VideoGroup.objects.all()
+    identifiers = VideoGroup.objects.order_by('-created_at')
+    return render(request, 'main_app/video_list.html', {'identifiers': identifiers})
+
+
+def return_playlist_by_id(request, identifier):
+    video_group = VideoGroup.objects.order_by('-created_at')
+    selected_identifier = get_object_or_404(VideoGroup, identifier=identifier)
     videos = Video.objects.all()
-    selected_identifier = request.GET.get('identifier')
     filtered_videos = videos.filter(videogroup__identifier=selected_identifier) if selected_identifier else videos
     return render(request, 'main_app/video_list.html', {'identifiers': video_group, 'videos': filtered_videos})
 
 
 def start_parsing(request):
-    video_group = VideoGroup.objects.create()
+    # video_group = VideoGroup.objects.create()
+    video_group = VideoGroup.objects.order_by('-created_at')
     # start_parse_data_for_id(video_group)
-    return render(request, 'main_app/video_list.html', {'identifiers': video_group, 'videos': filtered_videos})
+    return render(request, 'main_app/video_list.html', {'identifiers': video_group, 'videos': []})

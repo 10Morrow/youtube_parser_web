@@ -1,0 +1,208 @@
+.row:after {
+  content: "";
+  display: table;
+  clear: both;
+}
+
+.header-inner {
+    background: black;
+    margin-bottom: 5px;
+    overflow: hidden;
+    padding:5px;
+}
+.header-body {
+    overflow: auto;
+    background: white;
+}
+.header-row {
+    margin-left: 50px;
+    margin-right:50px;
+    display: flex;
+    align-items: center;
+}
+.header-body a {
+    color: black;
+    font-family: 'Tektur', cursive;
+}
+.header-main-page {
+    width: 35%;
+    float: left;
+    text-align: left;
+}
+.header-parsed-data {
+    width: 35%;
+    float: left;
+    text-align: center;
+}
+.header-settings {
+    width: 30%;
+    float: left;
+    text-align: right;
+}
+
+
+.sidebar {
+    color: white;
+    width: 20%;
+    float: left;
+}
+.sidebar-inner {
+    background: black;
+    min-height: 500px;
+    margin-right: 10px;
+    overflow: hidden;
+}
+.sidebar-name {
+    font-family: 'Tektur', cursive;
+    margin: 5px;
+    color: black;
+    text-align: center;
+    background: white;
+}
+
+.sidebar-content {
+    height: 460px;
+    overflow: auto;
+    margin: 5px;
+    background: white;
+}
+.sidebar-content::-webkit-scrollbar {
+  width: 8px;
+}
+
+.sidebar-content::-webkit-scrollbar-track {
+  background: rgba(0, 0, 0, 0.1);
+}
+
+.sidebar-content::-webkit-scrollbar-thumb {
+  background-color: rgba(0, 0, 0, 0.5);
+  border-radius: 4px;
+}
+
+.sidebar-content::-webkit-scrollbar-thumb:hover {
+  background-color: rgba(0, 0, 0, 0.7);
+}
+.sidebar-start-parsing-block {
+    margin: 10px;
+    text-align: center;
+    background: white;
+    overflow: hidden;
+    border: 3px solid black;
+    border-radius: 10px;
+    font-family: 'Tektur', cursive;
+    box-shadow: 2px 2px 4px rgba(0, 0, 0, 0.2);
+}
+.button {
+        display: inline-block;
+        padding-top: 10px;
+        padding-bottom: 10px;
+        padding-left: 50px;
+        padding-right: 50px;
+        background-color: inherit;
+        border: none;
+        border-radius: 0;
+        box-shadow: none;
+        cursor: pointer;
+    }
+.start-parsing {
+    color: black;
+}
+.sidebar-content-block {
+    margin: 10px;
+    padding: 10px;
+    text-align: center;
+    background: black;
+    overflow: hidden;
+    border-radius: 10px;
+    font-family: 'Tektur', cursive;
+}
+.identificator {
+    color: white;
+    text-decoration: none;
+}
+
+
+.content {
+    width: 80%;
+    float: left;
+}
+
+.content-inner {
+    background: black;
+    min-height: 500px;
+    overflow: hidden;
+}
+
+.content-header {
+    margin: 5px;
+    background: white;
+    font-family: 'Tektur', cursive;
+}
+.content-header-row {
+    margin-top: 5px;
+    margin-left: 50px;
+    margin-right: 50px;
+}
+.content-header-block1{
+    width: 35%;
+    float: left;
+    text-align: center;
+
+}
+.content-header-block2 {
+    width: 35%;
+    float: left;
+    text-align: center;
+
+}
+.content-header-block3 {
+    width: 30%;
+    float: left;
+    text-align: center;
+
+}
+
+.content-body {
+    height: 460px;
+    overflow: auto;
+    margin: 5px;
+    background: white;
+    font-family: 'Tektur', cursive;
+
+}
+.body-row {
+    margin-top: 15px;
+    margin-left: 50px;
+    margin-right: 50px;
+    display: flex;
+    align-items: center;
+    }
+.content-body-video {
+    width: 35%;
+    float: left;
+    aspect-ratio: 16/9;
+    overflow: hidden;
+    border-radius: 10px;
+}
+
+.content-body-views-subs {
+    width: 35%;
+    float: left;
+    text-align: center;
+
+}
+
+.content-body-monetization {
+    width: 30%;
+    float: left;
+    text-align: center;
+}
+
+
+
+
+.footer-inner {
+    background: black;
+    height: 40px;
+    margin-top: 10px;
+}

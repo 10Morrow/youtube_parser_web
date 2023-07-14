@@ -2,6 +2,7 @@ from django.db import models
 import string
 import random
 
+
 class Video(models.Model):
     video_link = models.CharField(max_length=200)
     views = models.PositiveIntegerField()

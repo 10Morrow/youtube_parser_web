@@ -1,24 +1,82 @@
+{% load static %}
 <!DOCTYPE html>
 <html>
 <head>
-    <title>Список видео</title>
+    <link rel="stylesheet" type="text/css" href="{% static 'main_app/css/styles.css' %}">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Tektur&display=swap" rel="stylesheet">
+    <title>VIDEOS</title>
 </head>
 <body>
-    <a href="/start_parsing">START PARSING</a>
-    <h2>{{new_id}}</h2>
-    <form method="GET">
-    <select name="identifier">
-        {% for identifier in identifiers %}
-            <option value="{{ identifier }}">{{ identifier }}</option>
-        {% endfor %}
-    </select>
-    <input type="submit" value="Загрузить">
-    </form>
-    <h1>Список видео</h1>
-    <ul>
-        {% for video in videos %}
-        <li>{{ video.video_link }}</li>
-        {% endfor %}
-    </ul>
+    <div class="wrapper">
+        <div class="header">
+        <div class="header-inner">
+            <div class="header-body">
+                <div class="row header-row">
+                    <div class="header-main-page">
+                        <a href="#" class="main-page-link">MAIN PAGE</a>
+                    </div>
+                    <div class="header-parsed-data">
+                        <a href="#" class="parsed-data-link">PARSED DATA</a>
+                    </div>
+                    <div class="header-settings">
+                        <a href="#" class="settings-link">SETTINGS</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+        </div>
+        <div class="row">
+            <div class="sidebar">
+                <div class="sidebar-inner">
+                    <div class="sidebar-name">ID LIST</div>
+                    <div class="sidebar-content">
+                        <div class="sidebar-start-parsing-block">
+                                <a href="{% url 'main_app:start_parsing' %}" class="start-parsing button">START PARSING</a>
+                        </div>
+                        {% for identifier in identifiers %}
+                            <div class="sidebar-content-block">
+                                <a href="{% url 'main_app:identifier' identifier=identifier%}"
+                                   class="identificator button">{{ identifier.created_at|date:"F d"}}
+                                   {{ identifier.created_at|time:"H:i" }}</a>
+                            </div>
+                        {% endfor %}
+                    </div>
+                </div>
+            </div>
+            <div class="content">
+                <div class="content-inner">
+                    <div class="content-header">
+                        <div class="row content-header-row">
+                            <div class="content-header-block1">VIDEO</div>
+                            <div class="content-header-block2">VIEWS / SUBSCRIBERS</div>
+                            <div class="content-header-block3">MONETIZATION</div>
+                        </div>
+                    </div>
+                    {% if videos %}
+                    <div class="content-body">
+                        {% for video in videos %}
+                            <div class="row body-row">
+                                <div class="content-body-video">
+                                    <iframe width="100%" height="100%" src="{{video.video_link}}" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowfullscreen></iframe>
+                                </div>
+                                <div class="content-body-views-subs">{{video.views}} / {{video.subscribers}}</div>
+                                {% if video.monetized %}
+                                    <div class="content-body-monetization">YES</div>
+                                {% else %}
+                                    <div class="content-body-monetization">NO</div>
+                                {% endif %}
+                            </div>
+                        {% endfor %}
+                    </div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+        <div class="footer">
+            <div class="footer-inner">footer</div>
+        </div>
+    </div>
 </body>
 </html>

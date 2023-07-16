@@ -15,13 +15,13 @@
             <div class="header-body">
                 <div class="row header-row">
                     <div class="header-main-page">
-                        <a href="#" class="main-page-link">MAIN PAGE</a>
+                        <a href="{% url 'main_app:main_page' %}" class="main-page-link">MAIN PAGE</a>
                     </div>
                     <div class="header-parsed-data">
-                        <a href="#" class="parsed-data-link">PARSED DATA</a>
+                        <a href="{% url 'main_app:parsed_data' %}" class="parsed-data-link">PARSED DATA</a>
                     </div>
                     <div class="header-settings">
-                        <a href="#" class="settings-link">SETTINGS</a>
+                        <a href="{% url 'main_app:settings' %}" class="settings-link">SETTINGS</a>
                     </div>
                 </div>
             </div>
@@ -30,7 +30,7 @@
         <div class="row">
             <div class="sidebar">
                 <div class="sidebar-inner">
-                    <div class="sidebar-name">{% block sidebar_name %}SIDEBAR NAME{% endblock %}</div>
+                    <div class="sidebar-name">{% block sidebar_name %}DESCRIPTION{% endblock %}</div>
                     <div class="sidebar-content">{% block sidebar_content %}{% endblock %}</div>
                 </div>
             </div>

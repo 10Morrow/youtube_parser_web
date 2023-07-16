@@ -3,9 +3,17 @@ from django.shortcuts import render, get_object_or_404
 from .models import Video, VideoGroup
 
 
-def video_list_view(request):
+def video_identifiers_view(request):
     identifiers = VideoGroup.objects.order_by('-created_at')
-    return render(request, 'main_app/video_list.html', {'identifiers': identifiers})
+    return render(request, 'main_app/parsed_data.html', {'identifiers': identifiers})
+
+
+def settings(request):
+    return render(request, 'main_app/settings.html')
+
+
+def main_page_view(request):
+    return render(request, 'main_app/main_page.html')
 
 
 def return_playlist_by_id(request, identifier):

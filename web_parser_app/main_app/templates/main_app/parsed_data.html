@@ -1,0 +1,17 @@
+{% extends "main_app/base.html" %}
+{% load static %}
+{% block sidebar_name %}ID LIST{% endblock %}
+{% block sidebar_content %}
+<div class="sidebar-start-parsing-block">
+        <a href="{% url 'main_app:start_parsing' %}" class="start-parsing button"
+        >START PARSING</a>
+</div>
+{% for identifier in identifiers %}
+    <div class="sidebar-content-block">
+        <a href="{% url 'main_app:identifier' identifier=identifier%}"
+           class="identificator button">{{ identifier.created_at|date:"F d"}}
+           {{ identifier.created_at|time:"H:i" }}</a>
+    </div>
+    {% endfor %}
+{% endblock %}
+{% block content_header %}WHAT TO DO NEXT ?{% endblock %}

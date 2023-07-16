@@ -1,31 +1,21 @@
 {% extends "main_app/base.html" %}
 {% load static %}
-<!DOCTYPE html>
-<html>
-<head>
-    <link rel="stylesheet" type="text/css" href="{% static 'main_app/css/styles.css' %}">
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Tektur&display=swap" rel="stylesheet">
-    <title>VIDEOS</title>
-</head>
-<body>
-    {% block sidebar_name %}ID LIST{% endblock %}
-    {% block sidebar_content %}
-    <div class="sidebar-start-parsing-block">
-            <a href="{% url 'main_app:start_parsing' %}" class="start-parsing button"
-            >START PARSING</a>
+{% block sidebar_name %}ID LIST{% endblock %}
+{% block sidebar_content %}
+<div class="sidebar-start-parsing-block">
+        <a href="{% url 'main_app:start_parsing' %}" class="start-parsing button"
+        >START PARSING</a>
+</div>
+{% for identifier in identifiers %}
+    <div class="sidebar-content-block">
+        <a href="{% url 'main_app:identifier' identifier=identifier%}"
+           class="identificator button">{{ identifier.created_at|date:"F d"}}
+           {{ identifier.created_at|time:"H:i" }}</a>
     </div>
-    {% for identifier in identifiers %}
-        <div class="sidebar-content-block">
-            <a href="{% url 'main_app:identifier' identifier=identifier%}"
-               class="identificator button">{{ identifier.created_at|date:"F d"}}
-               {{ identifier.created_at|time:"H:i" }}</a>
-        </div>
-        {% endfor %}
-    {% endblock %}
+    {% endfor %}
+{% endblock %}
 
-    {% block content_header %}
+{% block content_header %}
 <!--                    <div class="content-header">-->
 <!--                        <div class="row content-header-row">-->
 <!--                            <div class="content-header-block1">SORTED BY</div>-->
@@ -34,28 +24,26 @@
 <!--                        </div>-->
 <!--                    </div>-->
 
-    <div class="row content-header-row">
-        <div class="content-header-block1">VIDEO</div>
-        <div class="content-header-block2">VIEWS / SUBSCRIBERS</div>
-        <div class="content-header-block3">MONETIZATION</div>
-    </div>
-    {% endblock %}
-    {% if videos %}
-        {% block content_body %}
-            {% for video in videos %}
-                <div class="row body-row">
-                    <div class="content-body-video">
-                        <iframe width="100%" height="100%" src="{{video.video_link}}" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowfullscreen></iframe>
-                    </div>
-                    <div class="content-body-views-subs">{{video.views}} / {{video.subscribers}}</div>
-                    {% if video.monetized %}
-                        <div class="content-body-monetization">YES</div>
-                    {% else %}
-                        <div class="content-body-monetization">NO</div>
-                    {% endif %}
+<div class="row content-header-row">
+    <div class="content-header-block1">VIDEO</div>
+    <div class="content-header-block2">VIEWS / SUBSCRIBERS</div>
+    <div class="content-header-block3">MONETIZATION</div>
+</div>
+{% endblock %}
+{% if videos %}
+    {% block content_body %}
+        {% for video in videos %}
+            <div class="row body-row">
+                <div class="content-body-video">
+                    <iframe width="100%" height="100%" src="{{video.video_link}}" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowfullscreen></iframe>
                 </div>
-            {% endfor %}
-        {% endblock %}
-    {% endif %}
-</body>
-</html>
+                <div class="content-body-views-subs">{{video.views}} / {{video.subscribers}}</div>
+                {% if video.monetized %}
+                    <div class="content-body-monetization">YES</div>
+                {% else %}
+                    <div class="content-body-monetization">NO</div>
+                {% endif %}
+            </div>
+        {% endfor %}
+    {% endblock %}
+{% endif %}

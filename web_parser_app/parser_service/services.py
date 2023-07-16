@@ -1,56 +1,34 @@
-import os
-import datetime
-import csv
 import json
+import aiohttp
+
 from json import JSONDecodeError
 from bs4 import BeautifulSoup
 
-from config import MIN_VIEW_COUNT, MAX_SUB_COUNT, SHORTS, JSON_FILE, VIDEO_FOLDER_NAME
+from config import ConfigDict
+config = ConfigDict()
 
 
-def json_dump(data):
-    with open(JSON_FILE, "w") as write_file:
-        json.dump(data, write_file)
-
-
-def json_load():
-    if os.path.isfile(JSON_FILE):
-        with open(JSON_FILE, "r") as read_file:
-            data = json.load(read_file)
-        return data
-    else:
-        with open(JSON_FILE, "w") as file:
-            file.write("{}")
-        return {}
-
-
-def write_data(data_list: list, count: int) -> None:
-    """write parsed data in .csv file"""
-    cur_time = datetime.datetime.now().strftime("%d_%m_%Y_%H_%M")
-    if os.path.isdir(VIDEO_FOLDER_NAME):
-        with open(f"{VIDEO_FOLDER_NAME}/videos_{cur_time}_part_{count}.csv", mode="w", encoding='utf-8') as w_file:
-            file_writer = csv.writer(w_file, delimiter=",", lineterminator="\r")
-            file_writer.writerow(["Video link", "Views count", "Channel link", "subscribers count", "monetization"])
-            file_writer.writerows(data_list)
-    else:
-        os.makedirs(VIDEO_FOLDER_NAME)
-        write_data(data_list, count)
-
-
-def saver(data):
-    with open("video_information", "w") as file:
-        json.dump(data, file)
-
-
-def create_word_list(word_file: str) -> list:
+def create_word_list(word_file_path: str) -> list:
     """return list of words from your file with english words"""
-    with open(word_file) as file:
+    with open(word_file_path) as file:
         word_list = file.readlines()
     word_list = [line.rstrip() for line in word_list]
     return word_list
 
 
-def parse_web_page_by_our_settings(response_text: str) -> dict:
+async def get_response(session: aiohttp.Session, url: str, proxy_auth: aiohttp.BasicAuth) -> object:
+    proxy_address = config["proxy_address"]
+    if proxy_auth:
+        async with session.get(url=url, proxy=f"http://{proxy_address}",
+                               proxy_auth=proxy_auth) as response:
+            response_text = await response.text()
+    else:
+        async with session.get(url=url) as response:
+            response_text = await response.text()
+    return response_text
+
+
+def parse_search_page(response_text) -> dict:
     """parse html code (response_text) of page with videos and return list of needed data"""
     parsed_video_data = []
 
@@ -70,19 +48,18 @@ def parse_web_page_by_our_settings(response_text: str) -> dict:
     except KeyError:
         return {"success": False}
 
-    for i in range(len(result_of_section['contents'])):
+    for section_post in result_of_section['contents']:
         try:
-            section_post = result_of_section['contents'][i]
             if "videoRenderer" in section_post:
                 video_information = section_post['videoRenderer']
             elif "backgroundPromoRenderer" in section_post:
-                return {"success": False}
+                continue
             elif "didYouMeanRenderer" in section_post or \
                     "showingResultsForRenderer" in section_post or \
                     "infoPanelContainerRenderer" in section_post:
-                return {"success": False}
+                continue
             elif "searchPyvRenderer" in section_post:
-                return {"success": False}
+                continue
             else:
                 continue
             video_link_type = video_information['navigationEndpoint']['commandMetadata']['webCommandMetadata']['url']
@@ -90,50 +67,44 @@ def parse_web_page_by_our_settings(response_text: str) -> dict:
         except KeyError as ex:
             continue
 
-        if 'shorts' in video_link_type:
-            if not SHORTS:
-                continue
-
-        video_link = f"https://www.youtube.com{video_link_type.split('&')[0]}"
-
         try:
             if video_information['viewCountText']['simpleText'] == "No views":
                 video_views = 0
             else:
+                ###
                 video_views = int(
                     video_information['viewCountText']['simpleText'].split(' ')[0].replace(u'\xa0', u'').replace(',', ''))
+                ###
+
         except JSONDecodeError as ex:
             continue
         except ValueError as ex:
             continue
 
+        if video_views < config["min_view_count"]:
+            continue
+
+        if 'shorts' in video_link_type:
+            if not config["shorts"]:
+                continue
+        ###
+        video_link = f"https://www.youtube.com/embed{video_link_type.split('&')[0]}"
+        ###
+
         try:
+            ###
             video_channel_link = 'https://www.youtube.com' + str(
                 video_information['longBylineText']['runs'][0]['navigationEndpoint']['commandMetadata'][
                     'webCommandMetadata']['url'])
+            ###
         except:
             continue
 
-        if video_views > MIN_VIEW_COUNT:
-            parsed_video_data.append([video_link, video_views, video_channel_link])
+        parsed_video_data.append([video_link, video_views, video_channel_link])
     return {"success": True, "parsed_videos": parsed_video_data}
 
 
-def check_channel_link(cache, channel_link):
-    if channel_link not in cache:
-        return False
-
-    return cache[channel_link]
-
-
-def save_needed_data(data):
-    with open("new_file.txt", "w") as file:
-        for i in data:
-            file.write("\n\n\n")
-            file.write(str(i))
-
-
-def parse_data_by_channel_subs(response_text, one_list, cache, channel_url):
+def parse_data_by_channel_subs(response_text):
     soup = BeautifulSoup(response_text, 'lxml')
     search = soup.find_all("script")
     if not search:
@@ -163,14 +134,9 @@ def parse_data_by_channel_subs(response_text, one_list, cache, channel_url):
     try:
         is_monetization = json_data["responseContext"]["serviceTrackingParams"][0]["params"][3]["value"]
     except KeyError:
-        is_monetization = "unknown"
+        is_monetization = False
 
-    cache[channel_url] = [count, is_monetization]
-    json_dump(cache)
-
-    if count < MAX_SUB_COUNT:
-        one_list.append(int(count))
-        one_list.append(is_monetization)
-        return {"success": True, "checked_data": one_list}
+    if count < config["max_sub_count"]:
+        return {"success": True, "checked_data": [int(count), is_monetization]}
     else:
         return {"success": False}

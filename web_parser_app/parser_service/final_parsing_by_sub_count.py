@@ -1,60 +1,57 @@
 import asyncio
 import aiohttp
-from functools import partial
 
-from config import PROXY_ADDRESS, PROXY_LOGIN, PROXY_PASS, MAX_SUB_COUNT
-from services import parse_data_by_channel_subs, check_channel_link, json_load
+from ..main_app.models import Video, VideoGroup
+from services import parse_data_by_channel_subs, get_response
+from config import ConfigDict
+config = ConfigDict()
 
-finish_data_list = []
 
-
-async def check_list_by_sub_count(session: aiohttp.ClientSession, proxy_auth: aiohttp.BasicAuth,
-							cache: dict, one_list: list) -> None:
+async def check_list_by_sub_count(session: aiohttp.ClientSession, one_list: list,
+								proxy_auth: aiohttp.BasicAuth = None) -> None:
 	"""check subscribers count on video owner's channel
-	and return this data if count more than MAX_SUB_COUNT (from config.py)"""
-	global finish_data_list
+	and return this data if count more than MAX_SUB_COUNT (from config.py)
+	result looks like [video_link, video_views, video_channel_link, subscribers_count, is_monetized]"""
 
-	channel_url, video_url = one_list[-1], one_list[0]
+	channel_url, views_count, video_url = one_list
 	if not any(video_url in video_data for video_data in finish_data_list):
 
-		channel_in_cache = check_channel_link(cache, channel_url)
+		channel_in_cache = check_channel_link(channel_url)
 
 		if not channel_in_cache:
 			try:
-				async with session.get(url=channel_url, proxy=f"http://{PROXY_ADDRESS}",
-									proxy_auth=proxy_auth) as response:
-					response_text = await response.text()
+				response_text = get_response(session, channel_url, proxy_auth)
 			except aiohttp.TooManyRedirects:
 				return None
 			except aiohttp.ClientPayloadError:
 				return None
-			filtered_data = parse_data_by_channel_subs(response_text, one_list, cache, channel_url)
+			filtered_data = parse_data_by_channel_subs(response_text)
 			if filtered_data["success"]:
-				finish_data_list.append(filtered_data["checked_data"])
+				count, is_monetization = filtered_data["checked_data"]
+				cache[channel_url] = [count, is_monetization]
 		else:
+			sub_count = channel_in_cache[0]
 			is_monetization = channel_in_cache[1]
-			count = channel_in_cache[0]
-			if count < MAX_SUB_COUNT:
-				one_list += [count, is_monetization]
-				finish_data_list.append(one_list)
+			if sub_count < config["max_sub_count"]:
+				video_group = VideoGroup.objects.get(identifier=config["identifier"])
+				video = Video.objects.create(video_link=video_url, views=views_count, subscribers=sub_count,
+											monetized=is_monetization)
+				video_group.videos.add(video)
 
 
-def create_task_for_finish_data(session: aiohttp.ClientSession, proxy_auth,
-								cache: dict, youtube_list: list) -> asyncio.Task:
-
-	return asyncio.create_task(check_list_by_sub_count(session, proxy_auth, cache, youtube_list))
-
-
-async def finish_data(youtube_data: list) -> list:
+async def gather_chanel_page_data(youtube_data: list) -> None:
 	"""returns the finished parsing result, which has been filtered by channel subscribers"""
-	cache = json_load()
 	try:
 		session = aiohttp.ClientSession()
-		proxy_auth = aiohttp.BasicAuth(PROXY_LOGIN, PROXY_PASS)
-		partial_function = partial(create_task_for_finish_data, session, proxy_auth, cache)
-		finish_tasks = list(map(partial_function, youtube_data))
-		await asyncio.gather(*finish_tasks)
+		if config["proxy_login"] and config["proxy_pass"]:
+			proxy_auth = aiohttp.BasicAuth(config["proxy_login"], config["proxy_pass"])
+			tasks = [check_list_by_sub_count(session, youtube_link, proxy_auth) for youtube_link
+					in youtube_data]
+		else:
+			tasks = [check_list_by_sub_count(session, youtube_link) for youtube_link
+					in youtube_data]
+
+		await asyncio.gather(*tasks)
 		await session.close()
 	except aiohttp.client_exceptions.ServerDisconnectedError:
 		await session.close()
-	return finish_data_list

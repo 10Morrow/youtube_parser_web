@@ -1,44 +1,46 @@
 import asyncio
 import aiohttp
-from aiohttp import ClientSession
-from functools import partial
 
-from config import PROXY_ADDRESS, PROXY_LOGIN, PROXY_PASS
-from services import parse_web_page_by_our_settings
-youtube_data = []
+from config import ConfigDict
+from services import parse_search_page, get_response
+
+youtube_data = [] # list of lists with video_link, video_views, video_channel_link
+config = ConfigDict()
 
 
-async def get_page_data(session, proxy_auth, mode: str, word: str, ) -> None:
-	"""parse data and add to youtube_data list"""
+async def add_page_data_to_list(session: aiohttp.ClientSession, word: str, proxy_auth: aiohttp.BasicAuth = None) -> None:
+	"""parse search page and add to youtube_data list relevant video"""
 	global youtube_data
-
+	mode = config["mode"]
 	url = f"https://www.youtube.com/results?search_query={word}&sp={mode}"
+
 	try:
-		async with session.get(url=url, proxy=f"http://{PROXY_ADDRESS}",
-										proxy_auth=proxy_auth) as response:
-			response_text = await response.text()
+		response_text = await get_response(session, url, proxy_auth)
 	except aiohttp.TooManyRedirects:
 		return None
 	except aiohttp.ClientPayloadError:
 		return None
+
 	if response_text:
-		page_data = parse_web_page_by_our_settings(response_text)
-		if page_data["success"]:
-			youtube_data += page_data["parsed_videos"]
+		video_data_list = parse_search_page(response_text)
+		if video_data_list["success"]:
+			youtube_data += video_data_list["parsed_videos"]
 
 
-def create_task_for_asyncio(session: ClientSession, proxy_auth, mode: str, word: str) -> asyncio.Task:
-	return asyncio.create_task(get_page_data(session, proxy_auth, mode, word))
-
-
-async def gather_data(word_list: list, mode: str) -> list:
-	"""creating a list of tasks for get_page_data function"""
+async def gather_search_page_data(word_list: list) -> list:
+	"""creating a list of tasks, return list with data from search page"""
 	global youtube_data
 	session = aiohttp.ClientSession()
-	proxy_auth = aiohttp.BasicAuth(PROXY_LOGIN, PROXY_PASS)
 	try:
-		partial_function = partial(create_task_for_asyncio, session, proxy_auth, mode)
-		tasks = list(map(partial_function, word_list))
+
+		if config["proxy_login"] and config["proxy_pass"]:
+			proxy_auth = aiohttp.BasicAuth(config["proxy_login"], config["proxy_pass"])
+			tasks = [asyncio.create_task(add_page_data_to_list(session, word, proxy_auth)) for word
+					in word_list]
+		else:
+			tasks = [asyncio.create_task(add_page_data_to_list(session, word)) for word
+					in word_list]
+
 		await asyncio.gather(*tasks)
 		await session.close()
 

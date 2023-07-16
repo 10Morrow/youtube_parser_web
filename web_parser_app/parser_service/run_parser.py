@@ -1,34 +1,23 @@
 import sys
 import asyncio
-import time
-from config import PARTS_COUNT, WORDS_FILE, MODE
-from services import create_word_list, write_data
-from parsing_by_words_and_views import gather_data
-from final_parsing_by_sub_count import finish_data
+from config import get_config_data
+from services import create_word_list
+from parsing_by_words_and_views import gather_search_page_data
+from final_parsing_by_sub_count import gather_chanel_page_data
 
 
-def main():
+def main(identifier, current_user):
 	"""start full process of parsing"""
-
-	word_list = create_word_list(WORDS_FILE)
-	mode = MODE
-	count = 1
-	for i in range(PARTS_COUNT, len(word_list), PARTS_COUNT):
-		t1 = time.time()
-		part_of_words = word_list[i-PARTS_COUNT:i]
+	config = get_config_data(identifier, current_user)
+	word_list = create_word_list(config["words_file"])
+	for i in range(5000, len(word_list), 5000):
+		part_of_words = word_list[i-5000:i]
 
 		if sys.platform == 'win32':
 			asyncio.set_event_loop_policy(asyncio.WindowsSelectorEventLoopPolicy())
 		else:
 			asyncio.set_event_loop_policy(asyncio.DefaultEventLoopPolicy())
 
-		relevant_video_data = asyncio.run(gather_data(part_of_words, mode))
-		if relevant_video_data:
-			finished_data_list = asyncio.run(finish_data(relevant_video_data))
-		else:
-			continue
-
-		if finished_data_list:
-			write_data(finished_data_list, count)
-			t2 = time.time()
-			count += 1
+		parsed_data_from_search_page = asyncio.run(gather_search_page_data(part_of_words))
+		if parsed_data_from_search_page:
+			asyncio.run(gather_chanel_page_data(parsed_data_from_search_page))

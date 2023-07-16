@@ -3,6 +3,14 @@ import string
 import random
 
 
+def generate_unique_identifier():
+    characters = string.ascii_uppercase + string.digits
+    while True:
+        identifier = ''.join(random.choice(characters) for _ in range(7))
+        if not VideoGroup.objects.filter(identifier=identifier).exists():
+            return identifier
+
+
 class Video(models.Model):
     video_link = models.CharField(max_length=200)
     views = models.PositiveIntegerField()
@@ -11,14 +19,6 @@ class Video(models.Model):
 
     def __str__(self):
         return self.video_link
-
-
-def generate_unique_identifier():
-    characters = string.ascii_uppercase + string.digits
-    while True:
-        identifier = ''.join(random.choice(characters) for _ in range(7))
-        if not VideoGroup.objects.filter(identifier=identifier).exists():
-            return identifier
 
 
 class VideoGroup(models.Model):

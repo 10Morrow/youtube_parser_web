@@ -33,7 +33,8 @@
                     <div class="sidebar-name">ID LIST</div>
                     <div class="sidebar-content">
                         <div class="sidebar-start-parsing-block">
-                                <a href="{% url 'main_app:start_parsing' %}" class="start-parsing button">START PARSING</a>
+                                <a href="{% url 'main_app:start_parsing' %}" class="start-parsing button"
+                                >START PARSING</a>
                         </div>
                         {% for identifier in identifiers %}
                             <div class="sidebar-content-block">
@@ -47,6 +48,13 @@
             </div>
             <div class="content">
                 <div class="content-inner">
+<!--                    <div class="content-header">-->
+<!--                        <div class="row content-header-row">-->
+<!--                            <div class="content-header-block1">SORTED BY</div>-->
+<!--                            <div class="content-header-block2">VIEWS COUNT</div>-->
+<!--                            <div class="content-header-block3">FROM NEW TO OLD</div>-->
+<!--                        </div>-->
+<!--                    </div>-->
                     <div class="content-header">
                         <div class="row content-header-row">
                             <div class="content-header-block1">VIDEO</div>

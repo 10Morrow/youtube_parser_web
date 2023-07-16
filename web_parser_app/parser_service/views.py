@@ -1,4 +1,17 @@
 from django.shortcuts import render, get_object_or_404
+from .forms import PersonSettingsForm
+
+
+def settings(request):
+    user = request.user
+    settings = user.personsettings
+    if request.method == 'POST':
+        form = PersonSettingsForm(request.POST, instance=settings)
+        if form.is_valid():
+            form.save()
+    else:
+        form = PersonSettingsForm(instance=settings)
+    return render(request, 'parser_service/settings.html', {'form': form})
 
 
 def start_parsing(request):

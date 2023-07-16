@@ -1,0 +1,11 @@
+{% extends "main_app/base.html" %}
+{% block content_header %}SETTINGS{% endblock %}
+{% block content_body %}
+<div class="form-wrapper">
+    <form method="post" class="settings-form">
+      {% csrf_token %}
+      {{ form.as_p }}
+      <button type="submit">Сохранить</button>
+    </form>
+</div>
+{% endblock %}

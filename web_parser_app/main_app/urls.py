@@ -1,5 +1,5 @@
 from django.urls import path
-from .views import video_identifiers_view, start_parsing, return_playlist_by_id, main_page_view, settings
+from .views import video_identifiers_view, return_playlist_by_id, main_page_view, settings
 
 app_name = 'main_app'
 urlpatterns = [
@@ -7,5 +7,4 @@ urlpatterns = [
     path('settings', settings, name='settings'),
     path('parsed_data', video_identifiers_view, name='parsed_data'),
     path('parsed_data/<slug:identifier>', return_playlist_by_id, name='identifier'),
-    path('start_parsing', start_parsing, name='start_parsing'),
 ]

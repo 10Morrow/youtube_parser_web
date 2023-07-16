@@ -1,5 +1,8 @@
 from django.shortcuts import render, get_object_or_404
+
+from main_app.models import VideoGroup
 from .forms import PersonSettingsForm
+from .tasks import start_parsing_celery
 
 
 def settings(request):
@@ -15,8 +18,8 @@ def settings(request):
 
 
 def start_parsing(request):
-    # video_group = VideoGroup.objects.create()
-    # video_group_set = VideoGroup.objects.order_by('-created_at')
-    # start_parse_data_for_id(video_group)
-    # return render(request, 'main_app/video_list.html', {'identifiers': video_group_set, 'videos': []})
-    return render(request, 'main_app/base.html')
+    parsing_group_identifier = VideoGroup.objects.create()
+    user_id = request.user.id
+    video_group = VideoGroup.objects.order_by('-created_at')
+    start_parsing_celery.delay(parsing_group_identifier.identifier, user_id)
+    return render(request, 'main_app/parsed_data.html', {'identifiers': video_group, 'videos': []})

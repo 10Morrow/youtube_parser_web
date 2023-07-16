@@ -1,15 +1,16 @@
 import sys
 import asyncio
-from config import get_config_data
-from services import create_word_list
-from parsing_by_words_and_views import gather_search_page_data
-from final_parsing_by_sub_count import gather_chanel_page_data
+from .config import get_config_data
+from .services import create_word_list
+from .parsing_by_words_and_views import gather_search_page_data
+from .final_parsing_by_sub_count import gather_chanel_page_data
 
 
 def main(identifier, current_user):
 	"""start full process of parsing"""
 	config = get_config_data(identifier, current_user)
 	word_list = create_word_list(config["words_file"])
+	print(len(word_list))
 	for i in range(5000, len(word_list), 5000):
 		part_of_words = word_list[i-5000:i]
 

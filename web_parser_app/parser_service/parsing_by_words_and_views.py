@@ -1,8 +1,8 @@
 import asyncio
 import aiohttp
 
-from config import ConfigDict
-from services import parse_search_page, get_response
+from .config import ConfigDict
+from .services import parse_search_page, get_response
 
 youtube_data = [] # list of lists with video_link, video_views, video_channel_link
 config = ConfigDict()

@@ -1,10 +1,11 @@
 import json
 import aiohttp
 
+from django.core.cache import cache
 from json import JSONDecodeError
 from bs4 import BeautifulSoup
 
-from config import ConfigDict
+from .config import ConfigDict
 config = ConfigDict()
 
 
@@ -16,7 +17,7 @@ def create_word_list(word_file_path: str) -> list:
     return word_list
 
 
-async def get_response(session: aiohttp.Session, url: str, proxy_auth: aiohttp.BasicAuth) -> object:
+async def get_response(session: aiohttp, url: str, proxy_auth: aiohttp) -> object:
     proxy_address = config["proxy_address"]
     if proxy_auth:
         async with session.get(url=url, proxy=f"http://{proxy_address}",
@@ -89,6 +90,10 @@ def parse_search_page(response_text) -> dict:
                 continue
         ###
         video_link = f"https://www.youtube.com/embed{video_link_type.split('&')[0]}"
+        if cache.get(video_link):
+            continue
+        else:
+            cache.set(video_link, 1, timeout=3600)
         ###
 
         try:

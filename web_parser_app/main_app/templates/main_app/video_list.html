@@ -3,7 +3,7 @@
 {% block sidebar_name %}ID LIST{% endblock %}
 {% block sidebar_content %}
 <div class="sidebar-start-parsing-block">
-        <a href="{% url 'main_app:start_parsing' %}" class="start-parsing button"
+        <a href="{% url 'parser_service:parsing' %}" class="start-parsing button"
         >START PARSING</a>
 </div>
 {% for identifier in identifiers %}

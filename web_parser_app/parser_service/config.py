@@ -1,5 +1,5 @@
-from models import PersonSettings
-
+from .models import PersonSettings
+from django.contrib.auth.models import User
 YOUTUBE_FILTERS = {
 	"today_four_minuts_plus_by_views_count" : "CAMSBggCEAEYAw%253D%253D",
 	"today_by_views_count" : "CAMSBAgCEAE%253D",
@@ -23,11 +23,12 @@ class ConfigDict:
 		self.state[key] = value
 
 
-def get_config_data(identifier, current_user):
-	settings = PersonSettings.objects.get(user=current_user)
+def get_config_data(identifier, user_id):
+	user = User.objects.get(id=user_id)
+	settings = PersonSettings.objects.get(user=user)
 	config_data = ConfigDict()
 
-	config_data["words_file"] = settings.words_file
+	config_data["words_file"] = settings.words_file.path
 	config_data["min_view_count"] = settings.min_view_count
 	config_data["shorts"] = settings.shorts
 	config_data["max_sub_count"] = settings.max_sub_count

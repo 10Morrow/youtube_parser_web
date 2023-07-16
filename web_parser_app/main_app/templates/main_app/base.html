@@ -1,0 +1,49 @@
+{% load static %}
+<!DOCTYPE html>
+<html>
+<head>
+    <link rel="stylesheet" type="text/css" href="{% static 'main_app/css/styles.css' %}">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Tektur&display=swap" rel="stylesheet">
+    <title>{% block title %}{% endblock %}</title>
+</head>
+<body>
+    <div class="wrapper">
+        <div class="header">
+        <div class="header-inner">
+            <div class="header-body">
+                <div class="row header-row">
+                    <div class="header-main-page">
+                        <a href="#" class="main-page-link">MAIN PAGE</a>
+                    </div>
+                    <div class="header-parsed-data">
+                        <a href="#" class="parsed-data-link">PARSED DATA</a>
+                    </div>
+                    <div class="header-settings">
+                        <a href="#" class="settings-link">SETTINGS</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+        </div>
+        <div class="row">
+            <div class="sidebar">
+                <div class="sidebar-inner">
+                    <div class="sidebar-name">{% block sidebar_name %}SIDEBAR NAME{% endblock %}</div>
+                    <div class="sidebar-content">{% block sidebar_content %}{% endblock %}</div>
+                </div>
+            </div>
+            <div class="content">
+                <div class="content-inner">
+                    <div class="content-header">{% block content_header %}CONTENT HEADER{% endblock %}</div>
+                    <div class="content-body">{% block content_body %}{% endblock %}</div>
+                </div>
+            </div>
+        </div>
+        <div class="footer">
+            <div class="footer-inner">footer</div>
+        </div>
+    </div>
+</body>
+</html>

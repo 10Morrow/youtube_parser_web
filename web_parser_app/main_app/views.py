@@ -17,7 +17,8 @@ def return_playlist_by_id(request, identifier):
 
 
 def start_parsing(request):
-    video_group = VideoGroup.objects.create()
-    video_group = VideoGroup.objects.order_by('-created_at')
+    # video_group = VideoGroup.objects.create()
+    # video_group = VideoGroup.objects.order_by('-created_at')
     # start_parse_data_for_id(video_group)
-    return render(request, 'main_app/video_list.html', {'identifiers': video_group, 'videos': []})
+    # return render(request, 'main_app/video_list.html', {'identifiers': video_group, 'videos': []})
+    return render(request, 'main_app/base.html')

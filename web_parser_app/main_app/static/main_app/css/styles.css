@@ -135,6 +135,7 @@
 }
 
 .content-header {
+    text-align: center;
     margin: 5px;
     background: white;
     font-family: 'Tektur', cursive;

@@ -172,6 +172,29 @@
     font-family: 'Tektur', cursive;
 
 }
+
+.form-wrapper {
+    margin: 5px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.settings-form {
+    padding:5px;
+    text-align: center;
+    box-sizing: border-box;
+    max-width: 50%;
+    background: black;
+}
+
+.settings-form p {
+    padding: 5px;
+    margin: 15px;
+    background: white;
+    color: black;
+}
+
 .body-row {
     margin-top: 15px;
     margin-left: 50px;

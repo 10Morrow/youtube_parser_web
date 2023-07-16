@@ -8,10 +8,6 @@ def video_identifiers_view(request):
     return render(request, 'main_app/parsed_data.html', {'identifiers': identifiers})
 
 
-def settings(request):
-    return render(request, 'main_app/settings.html')
-
-
 def main_page_view(request):
     return render(request, 'main_app/main_page.html')
 
